@@ -1,5 +1,6 @@
 from app.models.player import Player
 from app.models.match import Match
+from app.models.elo_history import EloHistory
 from sqlalchemy.orm import Session
 
 # Logica de +-elo por partida
@@ -51,13 +52,37 @@ def apply_elo_to_match(match: Match, db: Session):
 
     # Se cambia el elo solo a internos
 
+    # Player A
     if not player_a.is_external:
-        points_a = calculate_elo_change(player_a, player_b, result_a, match.tournament_tier)
-        player_a.elo += points_a
+        before = player_a.elo
+        delta = calculate_elo_change(player_a, player_b, result_a, match.tournament_tier)
+        after = before + delta
+        player_a.elo = after
 
+        db.add(EloHistory(
+            player_id=player_a.id,
+            match_id=match.id,
+            elo_before=before,
+            elo_after=after,
+            delta=delta,
+            date=match.date
+        ))
+
+    # Player B
     if not player_b.is_external:
-        points_b = calculate_elo_change(player_b, player_a, result_b , match.tournament_tier)
-        player_b.elo += points_b
+        before = player_b.elo
+        delta = calculate_elo_change(player_b, player_a, result_b, match.tournament_tier)
+        after = before + delta
+        player_b.elo = after
+
+        db.add(EloHistory(
+            player_id=player_b.id,
+            match_id=match.id,
+            elo_before=before,
+            elo_after=after,
+            delta=delta,
+            date=match.date
+        ))
 
 
     db.commit()

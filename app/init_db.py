@@ -1,5 +1,5 @@
 from app.core.database import Base, engine
-from app.models import player, match
+from app.models import player, match, elo_history
 
 def init_db():
     Base.metadata.create_all(bind=engine)

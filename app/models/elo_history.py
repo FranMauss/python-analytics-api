@@ -1,13 +1,21 @@
 from sqlalchemy import Column, Integer, ForeignKey, DateTime
-from sqlalchemy.sql import func
-from app.core.database import Base
+from sqlalchemy.orm import relationship
+from app.db.base import Base
+from datetime import datetime
 
 class EloHistory(Base):
     __tablename__ = "elo_history"
 
     id = Column(Integer, primary_key=True, index=True)
+
     player_id = Column(Integer, ForeignKey("players.id"), nullable=False)
-    match_id = Column(Integer, ForeignKey("matches.id"), nullable=True)
+    match_id = Column(Integer, ForeignKey("matches.id"), nullable=False)
+
     elo_before = Column(Integer, nullable=False)
     elo_after = Column(Integer, nullable=False)
-    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    delta = Column(Integer, nullable=False)
+
+    date = Column(DateTime, default=datetime.utcnow)
+
+    player = relationship("Player")
+    match = relationship("Match")
