@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-from app.db.base import Base
+from app.core.database import Base
 from datetime import datetime
 
 class EloHistory(Base):
